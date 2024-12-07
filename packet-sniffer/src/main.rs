@@ -1,15 +1,14 @@
-use pcap::Device;
+mod device;
+mod capture;
+
+use device::get_device;
+use capture::sniff_packets;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let device = Device::lookup()?.ok_or("No device found")?;
-    println!("Using device: {}", device.name);
+    let device = get_device("wlp2s0")?;
+    println!("Using device {}", device.name);
 
-    let mut cap = device.open()?;
-    println!("Device opened for capturing!");
-
-    while let Ok(packet) = cap.next_packet() {
-        println!("Received packet: {:?}", packet);
-    }
+    sniff_packets(device)?;
 
     Ok(())
 }
